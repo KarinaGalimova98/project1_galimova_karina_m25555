@@ -17,3 +17,7 @@ poetry install
 make project
 # или
 poetry run project
+
+## Демонстрация игрового процесса
+
+https://asciinema.org/a/yDB9GqGMCobnRWPuqYF3iZJoc

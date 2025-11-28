@@ -2,7 +2,13 @@
 import math
 from typing import Any, Dict
 
-from labyrinth_game.constants import ROOMS
+from labyrinth_game.constants import (
+    EVENT_PROBABILITY_MODULO,
+    EVENT_TYPE_COUNT,
+    HELP_PADDING,
+    ROOMS,
+    TRAP_DEATH_THRESHOLD,
+)
 
 
 def describe_current_room(game_state: Dict[str, Any]) -> None:
@@ -56,8 +62,8 @@ def trigger_trap(game_state: Dict[str, Any]) -> None:
         return
 
     # инвентарь пуст — шанс смерти
-    roll = pseudo_random(game_state["steps_taken"], 10)
-    if roll < 3:
+    roll = pseudo_random(game_state["steps_taken"], EVENT_PROBABILITY_MODULO)
+    if roll < TRAP_DEATH_THRESHOLD:
         print("Пол под вами проваливается! Вы не успеваете выбраться...")
         print("Игра окончена. Вы погибли в ловушке.")
         game_state["game_over"] = True
@@ -67,12 +73,12 @@ def trigger_trap(game_state: Dict[str, Any]) -> None:
 def random_event(game_state: Dict[str, Any]) -> None:
     """Trigger a small random event during movement with low probability."""
     # Сначала решаем, будет ли событие вообще
-    roll = pseudo_random(game_state["steps_taken"], 10)
+    roll = pseudo_random(game_state["steps_taken"], EVENT_PROBABILITY_MODULO)
     if roll != 0:
         return
 
     # Выбираем тип события
-    event_type = pseudo_random(game_state["steps_taken"] + 1, 3)
+    event_type = pseudo_random(game_state["steps_taken"] + 1, EVENT_TYPE_COUNT)
     room_id = game_state["current_room"]
     room = ROOMS[room_id]
     inventory = game_state.get("player_inventory", [])
@@ -223,4 +229,4 @@ def show_help(commands: Dict[str, str]) -> None:
     """Print available commands for the player."""
     print("\nДоступные команды:")
     for cmd, description in commands.items():
-        print(f"  {cmd:<16} - {description}")
+        print(f"  {cmd.ljust(HELP_PADDING)} - {description}")

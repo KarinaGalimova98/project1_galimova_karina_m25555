@@ -1,3 +1,8 @@
+EVENT_PROBABILITY_MODULO = 10          # диапазон для случайных событий
+TRAP_DEATH_THRESHOLD = 3               # шанс смерти (< 3 из 10)
+EVENT_TYPE_COUNT = 3                   # количество типов случайных событий
+HELP_PADDING = 16                      # ширина поля для команды в show_help
+
 ROOMS = {
     "entrance": {
         "description": (

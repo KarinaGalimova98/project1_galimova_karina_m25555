@@ -1,13 +1,17 @@
 [tool.poetry]
 name = "project1-galimova-karina-m25555"
 version = "0.1.0"
-description = ""
-authors = ["Karina Galimova <you@example.com>"]
+description = "Консольная текстовая игра Лабиринт сокровищ"
+authors = ["Karina Galimova <karina.galimova.98@mail.ru>"]
+readme = "README.md"
 
 
 packages = [
      { include = "labyrinth_game" },
 ]
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.8"
  
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -29,7 +33,4 @@ ignore = []
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[dependency-groups]
-dev = [
-    "ruff (>=0.14.6,<0.15.0)"
-]
+
