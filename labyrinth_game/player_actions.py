@@ -3,7 +3,7 @@
 from typing import Any, Dict
 
 from labyrinth_game.constants import ROOMS
-from labyrinth_game.utils import describe_current_room
+from labyrinth_game.utils import describe_current_room, random_event
 
 
 def show_inventory(game_state: Dict[str, Any]) -> None:
@@ -38,9 +38,25 @@ def move_player(game_state: Dict[str, Any], direction: str) -> None:
         return
 
     new_room_id = exits[direction]
+
+    # Дополнительная проверка: вход в treasure_room только с rusty_key
+    if new_room_id == "treasure_room":
+        inventory = game_state.get("player_inventory", [])
+        if "rusty_key" in inventory:
+            print(
+                "Вы используете найденный ключ, чтобы открыть путь "
+                "в комнату сокровищ.",
+            )
+        else:
+            print("Дверь заперта. Нужен ключ, чтобы пройти дальше.")
+            return
+
     game_state["current_room"] = new_room_id
     game_state["steps_taken"] += 1
+
     describe_current_room(game_state)
+    # После успешного перемещения пытаемся запустить случайное событие
+    random_event(game_state)
 
 
 def take_item(game_state: Dict[str, Any], item_name: str) -> None:

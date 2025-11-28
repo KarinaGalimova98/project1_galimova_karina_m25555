@@ -1,5 +1,5 @@
 """Utility helpers for the labyrinth game."""
-
+import math
 from typing import Any, Dict
 
 from labyrinth_game.constants import ROOMS
@@ -32,6 +32,70 @@ def describe_current_room(game_state: Dict[str, Any]) -> None:
         )
     print()
 
+def pseudo_random(seed: int, modulo: int) -> int:
+    """Deterministic pseudo-random number in range [0, modulo)."""
+    if modulo <= 0:
+        return 0
+
+    x = math.sin(seed * 12.9898) * 43758.5453
+    fractional = x - math.floor(x)
+    value = int(fractional * modulo)
+    return value
+
+def trigger_trap(game_state: Dict[str, Any]) -> None:
+    """Simulate a trap being triggered with negative consequences."""
+    print("Ловушка активирована! Пол начинает дрожать...")
+
+    inventory = game_state.get("player_inventory", [])
+
+    if inventory:
+        # теряем случайный предмет из инвентаря
+        index = pseudo_random(game_state["steps_taken"], len(inventory))
+        lost_item = inventory.pop(index)
+        print(f"Вы теряете предмет: {lost_item}. Он исчез в трещине пола.")
+        return
+
+    # инвентарь пуст — шанс смерти
+    roll = pseudo_random(game_state["steps_taken"], 10)
+    if roll < 3:
+        print("Пол под вами проваливается! Вы не успеваете выбраться...")
+        print("Игра окончена. Вы погибли в ловушке.")
+        game_state["game_over"] = True
+    else:
+        print("Пол трескается, но вы чудом удерживаетесь и выбираетесь.")
+
+def random_event(game_state: Dict[str, Any]) -> None:
+    """Trigger a small random event during movement with low probability."""
+    # Сначала решаем, будет ли событие вообще
+    roll = pseudo_random(game_state["steps_taken"], 10)
+    if roll != 0:
+        return
+
+    # Выбираем тип события
+    event_type = pseudo_random(game_state["steps_taken"] + 1, 3)
+    room_id = game_state["current_room"]
+    room = ROOMS[room_id]
+    inventory = game_state.get("player_inventory", [])
+
+    if event_type == 0:
+        # Находка монетки
+        print("Вы замечаете на полу маленькую монетку.")
+        room_items = room.setdefault("items", [])
+        room_items.append("coin")
+        print("Монетка теперь лежит среди предметов этой комнаты.")
+    elif event_type == 1:
+        # Испуг
+        print("Вы слышите странный шорох где-то в темноте...")
+        if "sword" in inventory:
+            print("Вы вскидываете меч, и существо спешно скрывается.")
+        else:
+            print("Вы замираете, но звук затихает сам по себе.")
+    else:
+        # Попытка срабатывания ловушки
+        if room_id == "trap_room" and "torch" not in inventory:
+            print("Темно и опасно... Кажется, здесь может сработать ловушка.")
+            trigger_trap(game_state)
+
 
 def _safe_input(prompt: str) -> str:
     """Request input from the user, handling interrupts.
@@ -63,21 +127,41 @@ def solve_puzzle(game_state: Dict[str, Any]) -> None:
         game_state["game_over"] = True
         return
 
-    if user_answer.lower() == str(correct_answer).lower():
+    # Поддержка альтернативных вариантов ответа
+    user_norm = user_answer.lower()
+
+    if isinstance(correct_answer, (list, tuple, set)):
+        variants = [str(v).lower() for v in correct_answer]
+    else:
+        variants = [str(correct_answer).lower()]
+
+    if user_norm in variants:
         print("Верно! Загадка решена.")
-        # чтобы нельзя было решать её дважды
+        # Убираем загадку, чтобы нельзя было решить её дважды
         room["puzzle"] = None
 
         inventory = game_state["player_inventory"]
-        # простая логика награды: ключ от сокровищ в первый раз
-        if "treasure_key" not in inventory:
-            inventory.append("treasure_key")
-            print("Вы получаете таинственный ключ от сокровищницы!")
-        else:
+
+        # Награда зависит от комнаты
+        if room_id == "trap_room":
+            if "treasure_key" not in inventory:
+                inventory.append("treasure_key")
+                print("Вы чувствуете, что разгадка открыла путь к сокровищам.")
+        elif room_id == "hall":
             inventory.append("gold_coin")
             print("Вы находите золотую монету и кладёте её в инвентарь.")
+        elif room_id == "library":
+            if "rusty_key" not in inventory:
+                inventory.append("rusty_key")
+                print("Вы находите старый ключ между страницами свитка.")
+        else:
+            inventory.append("coin")
+            print("Вы получаете небольшую награду за сообразительность.")
     else:
         print("Неверно. Попробуйте снова.")
+        # В trap_room неправильный ответ может активировать ловушку
+        if room_id == "trap_room":
+            trigger_trap(game_state)
 
 
 def attempt_open_treasure(game_state: Dict[str, Any]) -> None:
@@ -135,3 +219,8 @@ def attempt_open_treasure(game_state: Dict[str, Any]) -> None:
     else:
         print("Код неверный. Сундук остаётся запертым.")
 
+def show_help(commands: Dict[str, str]) -> None:
+    """Print available commands for the player."""
+    print("\nДоступные команды:")
+    for cmd, description in commands.items():
+        print(f"  {cmd:<16} - {description}")

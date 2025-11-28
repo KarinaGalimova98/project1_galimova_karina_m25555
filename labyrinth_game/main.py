@@ -4,6 +4,7 @@
 
 from typing import Any, Dict
 
+from labyrinth_game.constants import COMMANDS
 from labyrinth_game.player_actions import (
     get_input,
     move_player,
@@ -14,6 +15,7 @@ from labyrinth_game.player_actions import (
 from labyrinth_game.utils import (
     attempt_open_treasure,
     describe_current_room,
+    show_help,
     solve_puzzle,
 )
 
@@ -55,6 +57,13 @@ def process_command(game_state: Dict[str, Any], raw_command: str) -> None:
                 print("Куда идти? Укажите направление (например, go north).")
             else:
                 move_player(game_state, arg)
+	
+        case "help" | "помощь":
+            show_help(COMMANDS)
+	
+        # Однословные направления без go
+        case "north" | "south" | "east" | "west":
+            move_player(game_state, verb)
 
         case "take" | "взять":
             if not arg:
@@ -86,8 +95,7 @@ def main() -> None:
     game_state = create_initial_state()
 
     print("Добро пожаловать в Лабиринт сокровищ!")
-    print("Команды: go <direction>, take <item>, use <item>, "
-          "look, solve, inventory, quit.")
+    show_help(COMMANDS)
     describe_current_room(game_state)
 
     while not game_state["game_over"]:

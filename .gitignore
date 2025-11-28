@@ -4,11 +4,10 @@
 
 dist/
 
-
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
+.venv/
+dist/
 
 
 .DS_Store
