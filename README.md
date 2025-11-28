@@ -10,14 +10,17 @@
 make install
 # или
 poetry install
-
+```
 
 ## Запуск игры
 
+```bash
 make project
 # или
 poetry run project
+```
 
 ## Демонстрация игрового процесса
-
+```bash
 https://asciinema.org/a/yDB9GqGMCobnRWPuqYF3iZJoc
+```
