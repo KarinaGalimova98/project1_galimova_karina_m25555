@@ -1,0 +1,11 @@
+# Виртуальное окружение Poetry
+.venv/
+
+
+dist/
+
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
