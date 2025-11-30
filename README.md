@@ -21,6 +21,4 @@ poetry run project
 ```
 
 ## Демонстрация игрового процесса
-```bash
-https://asciinema.org/a/yDB9GqGMCobnRWPuqYF3iZJoc
-```
+[![asciicast](https://asciinema.org/a/yDB9GqGMCobnRWPuqYF3iZJoc.svg)](https://asciinema.org/a/yDB9GqGMCobnRWPuqYF3iZJoc)
