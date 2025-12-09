@@ -21,4 +21,4 @@ poetry run project
 ```
 
 ## Демонстрация игрового процесса
-[![asciicast](https://asciinema.org/a/yDB9GqGMCobnRWPuqYF3iZJoc.svg)](https://asciinema.org/a/yDB9GqGMCobnRWPuqYF3iZJoc)
+[![asciicast](https://asciinema.org/a/LIvKQkl0OZQqkFzucEh2dmtYK.svg)](https://asciinema.org/a/LIvKQkl0OZQqkFzucEh2dmtYK)
